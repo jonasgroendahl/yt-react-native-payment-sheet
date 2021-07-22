@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import {
   CardField,
   StripeProvider,
@@ -5,13 +6,14 @@ import {
 } from '@stripe/stripe-react-native';
 import React, {useEffect, useState} from 'react';
 import {Alert, Button, SafeAreaView, View} from 'react-native';
+import {keys} from './keys';
 
 interface AppProps {}
 
 const App: React.FC<AppProps> = () => {
   return (
     <StripeProvider
-      publishableKey="put_your_key_here"
+      publishableKey={keys.public}
       merchantIdentifier="merchant.identifier">
       <SafeAreaView>
         <StripeTest />
@@ -21,7 +23,7 @@ const App: React.FC<AppProps> = () => {
 };
 
 const StripeTest: React.FC = () => {
-  const {confirmPayment} = useStripe();
+  const {confirmPayment, initPaymentSheet, presentPaymentSheet} = useStripe();
 
   const [key, setKey] = useState('');
 
@@ -33,6 +35,7 @@ const StripeTest: React.FC = () => {
       .then(res => {
         console.log('intent', res);
         setKey((res as {clientSecret: string}).clientSecret);
+        initPaymentSheet({paymentIntentClientSecret: key});
       })
       .catch(e => Alert.alert(e.message));
   }, []);
@@ -52,6 +55,12 @@ const StripeTest: React.FC = () => {
         Alert.alert('Error', error.message);
       }
     }
+  };
+
+  const handleSheet = () => {
+    presentPaymentSheet({
+      clientSecret: key,
+    });
   };
 
   return (
@@ -78,6 +87,7 @@ const StripeTest: React.FC = () => {
         }}
       />
       <Button title="Confirm payment" onPress={handleConfirmation} />
+      <Button title="Present sheet" onPress={handleSheet} />
     </View>
   );
 };

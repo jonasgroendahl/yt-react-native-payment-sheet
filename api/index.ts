@@ -1,7 +1,8 @@
 import express from 'express';
 import Stripe from 'stripe';
+import {keys} from '../keys';
 
-const stripe = new Stripe('put_your_key_here', {
+const stripe = new Stripe(keys.secret, {
   apiVersion: '2020-08-27',
   typescript: true,
 });
